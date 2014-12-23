@@ -1,0 +1,26 @@
+{
+    "githubAuth": null,
+    "gists": {
+        "engine.js": null
+    },
+    "output": {
+        "// possible options": "[file, gist]",
+        "engineDecompiled":       ["file"],
+        "engineModules":          ["file"],
+        "engineModulesHelp":      ["file"],
+        "engineModulesStructure": ["file"]
+    },
+    "file": {
+        "// post fixes for file output name": null,
+        "engineDecompiled":       ".out.js",
+        "engineModules":          ".modules.js",
+        "engineModulesHelp":      ".help.md",
+        "engineModulesStructure": ".names.js"
+    },
+    "gist": {
+        "engineDecompiled":       "engine.js",
+        "engineModules":          "modules.js",
+        "engineModulesHelp":      "readme.md",
+        "engineModulesStructure": "structure_calls.json"
+    }
+}

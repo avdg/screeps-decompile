@@ -1,0 +1,22 @@
+{
+  "name": "screeps-decompile",
+  "version": "0.1.0",
+  "description": "Decompiles certain files from screeps.com",
+  "main": "screepsDecompile.js",
+  "scripts": {
+    "test": "mocha"
+  },
+  "bin": {
+    "screeps-decompile": "screepsDecompile.js"
+  },
+  "devDependencies": {
+    "mocha": "2.0.x",
+    "uglify-js": "2.4.x",
+    "github-api": "0.10.3"
+  },
+  "keywords": [
+    "screeps decompile"
+  ],
+  "author": "Anthony Van de Gejuchte",
+  "license": "MIT"
+}
