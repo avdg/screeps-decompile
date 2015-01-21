@@ -6,7 +6,7 @@ var http = require('http');
 var path = require('path');
 
 var settings;
-var screepsEngineUrl = "http://screeps.com/g/engine.js";
+var screepsEngineUrl = "http://screeps.com/a/engine.js";
 var engineFile = "engine.js";
 var errorNoSettings = "No settings found, please use setSettings()\n" +
     path.join(__dirname, "settings.default.json") +
@@ -67,7 +67,7 @@ var unstringify = function(input, result) {
 
     var pos1, pos2;
 
-    result.parts = []
+    result.parts = [];
     for (var i = 0; i < parts.length; i++) {
         if (parts[i] === "")
             if (i < (parts.lengt) - 1)
@@ -205,7 +205,7 @@ var format = function(result) {
 
     result.strCodeFormatted = beautifyJS(result.strCode);
     result.moduleNamesFormatted = formatModuleNames(result.moduleNames);
-    result.readme = fs.readFileSync('jsonFormat.md', {encoding: 'utf8'})
+    result.readme = fs.readFileSync(path.join(__dirname, 'jsonFormat.md'), {encoding: 'utf8'});
 };
 
 var decode = function(input) {
@@ -238,7 +238,7 @@ var processEngine = function(location) {
         }
 
         if (Object.keys(gistFiles).length > 0) {
-            console.log('Updating gitst...');
+            console.log('Updating gist...');
             var github = require('github-api');
             var githubClient = new github({token: settings.githubAuth});
             var gist = githubClient.getGist(settings.gists[engineFile]);
