@@ -2,11 +2,12 @@
 
 // Usage: node <script name> [screeps engine.js file | url]
 var fs = require('fs');
-var http = require('http');
+var https = require('https');
 var path = require('path');
+var url = require('url');
 
 var settings;
-var screepsEngineUrl = "http://screeps.com/a/engine.js";
+var screepsEngineUrl = "https://screeps.com/a/engine.js";
 var engineFile = "engine.js";
 var errorNoSettings = "No settings found, please use setSettings()\n" +
     path.join(__dirname, "settings.default.json") +
@@ -270,14 +271,29 @@ var processEngine = function(location) {
     }
 };
 
-var getFromUrl = function(url, done, err) {
-    http.get(url, function(res) {
+var getFromUrl = function(location, done, err) {
+    var etag;
+
+    if (typeof location === "object") {
+        etag = location.etag;
+        location = location.location;
+    }
+
+    var request = url.parse(location);
+    request.headers = {'user-agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.65 Safari/537.36'};
+
+    if (typeof etag === "string") {
+        request.headers["If-None-Match"] = etag;
+    }
+
+    https.get(request, function(res) {
         var data = "";
         res.on("data", function(chunk) {
             data += chunk;
         });
         res.on("end", function(chunk) {
-            done(data);
+            console.log(data);
+            done(data, res);
         });
     }).on('error', err || function(e){
         throw e;
@@ -285,22 +301,40 @@ var getFromUrl = function(url, done, err) {
 };
 
 var compareEngineFiles = function(callback) {
-    var file;
-    var done = function(data) {
+    var file, fileData, req = {};
+    var done = function(data, res) {
         setTimeout(function() {
+            if (res.statusCode === 304) {
+                console.log("E-tag matches");
+                data = file;
+            }
+
             if (file === data) {
                 console.log('Cached and online versions are the same');
             } else {
                 console.log('Cached and online versions are different');
             }
 
-            callback && callback(file !== data, data);
+            callback && callback(file !== data, data, res);
         }, 0);
     };
 
-    console.log('Comparing files...');
-    getFromUrl(screepsEngineUrl, done, function(e) {
-        console.log('fetching engine.js from screeps.com failed');
+    req = {
+        location: screepsEngineUrl
+    };
+
+    fileData = fs.existsSync(engineFilePath + '.data') && fs.readFileSync(engineFilePath + '.data', {encoding: 'utf8'});
+    if (typeof fileData === "string") {
+        fileData = JSON.parse(fileData);
+
+        if (typeof fileData === "object" && typeof fileData.etag === "string") {
+            req.etag = fileData.etag;
+        }
+    }
+
+    console.log('Fetching engine file...');
+    getFromUrl(req, done, function(e) {
+        console.log('Fetching engine.js from screeps.com failed');
         throw e;
     });
     file = fs.existsSync(engineFilePath) && fs.readFileSync(engineFilePath, {encoding: 'utf8'});
@@ -367,11 +401,18 @@ if (!module.parent) {
         }
     } else {
         if (!argv[0]) {
-            compareEngineFiles(function(changed, data) {
+            compareEngineFiles(function(changed, data, res) {
                 if (changed) {
                     console.log("Engine.js has changed... Updating...");
                     console.log("Writing engine.js to local dist...");
                     fs.writeFileSync(engineFilePath, data);
+
+                    var resData = {};
+                    if (typeof res.headers.etag === "string") {
+                        resData.etag = res.headers.etag;
+                    }
+
+                    fs.writeFileSync(engineFilePath + '.data', JSON.stringify(resData));
                     processEngine(engineFilePath);
                 }
             });
