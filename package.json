@@ -10,9 +10,9 @@
     "screeps-decompile": "screepsDecompile.js"
   },
   "devDependencies": {
-    "mocha": "2.0.x",
+    "mocha": "2.2.x",
     "uglify-js": "2.4.x",
-    "github-api": "0.10.3"
+    "github-api": "0.10.6"
   },
   "keywords": [
     "screeps decompile"
