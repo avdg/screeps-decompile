@@ -411,6 +411,9 @@ if (!module.parent) {
                     if (typeof res.headers.etag === "string") {
                         resData.etag = res.headers.etag;
                     }
+                    if (typeof res.headers.date === "string") {
+                        resData.date = res.headers.date;
+                    }
 
                     fs.writeFileSync(engineFilePath + '.data', JSON.stringify(resData));
                     processEngine(engineFilePath);
